@@ -5,20 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aplikasi Sosiometri BK - SMP Negeri 2 Pekuncen</title>
   
-  <!-- Tailwind CSS & Icons -->
+  <!-- Tailwind CSS & Font Awesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Vis.js Network Library -->
+  <!-- Vis.js Network -->
   <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 
   <style>
-    #sociogram-canvas {
+    /* Styling Kanvas Graf */
+    .sociogram-box {
       width: 100%;
-      height: 600px;
+      height: 520px;
       background: #ffffff;
-      border-radius: 0.75rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 0.5rem;
     }
+
+    /* Teknik Tab Tanpa Mematikan Dimensi Canvas */
+    .tab-pane {
+      display: block;
+    }
+    .tab-pane.is-hidden {
+      position: absolute !important;
+      left: -9999px !important;
+      top: -9999px !important;
+      visibility: hidden !important;
+      height: 0 !important;
+      overflow: hidden !important;
+    }
+
     .custom-scroll::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -28,21 +44,24 @@
       border-radius: 4px;
     }
 
-    /* CSS KHUSUS MODE CETAK / PRINT PDF */
+    /* PENGATURAN CETAK / PRINT PDF */
     @media print {
       body {
         background: #ffffff !important;
         color: #000000 !important;
-        font-size: 11pt;
+        font-size: 10pt;
       }
       nav, #loadingIndicator, .no-print, footer, .tab-btn {
         display: none !important;
       }
-      .tab-content {
+      .tab-pane {
         display: none !important;
       }
       #tab-laporan {
         display: block !important;
+        position: static !important;
+        visibility: visible !important;
+        height: auto !important;
       }
       .print-page {
         box-shadow: none !important;
@@ -56,7 +75,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
 
-  <!-- TOP NAVIGATION BAR (Disembunyikan saat Cetak) -->
+  <!-- TOP NAVIGATION -->
   <nav class="bg-indigo-900 text-white shadow-lg sticky top-0 z-50 no-print">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
       <div class="flex items-center space-x-3">
@@ -94,7 +113,7 @@
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
 
     <!-- ==================== TAB 1: FORM ANGKET SISWA ==================== -->
-    <section id="tab-angket" class="tab-content max-w-xl mx-auto">
+    <section id="tab-angket" class="tab-pane max-w-xl mx-auto">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
         <div class="text-center mb-6">
           <h2 class="text-2xl font-bold text-slate-800">Angket Pemilihan Sosiometri</h2>
@@ -127,7 +146,7 @@
 
             <div class="mb-4">
               <label class="block text-sm font-semibold text-blue-700 mb-1">
-                <i class="fa-solid fa-2 mr-1"></i> Pilihan 2 (Prioritas Kedua)
+                <i class="fa-solid fa-2 mr-1"></i> Pilihan 2
               </label>
               <select id="selectP2" required class="w-full p-2.5 border border-blue-300 rounded-xl bg-blue-50 text-sm focus:ring-2 focus:ring-blue-500">
                 <option value="">-- Pilih Teman Pilihan 2 --</option>
@@ -136,10 +155,10 @@
 
             <div>
               <label class="block text-sm font-semibold text-amber-700 mb-1">
-                <i class="fa-solid fa-3 mr-1"></i> Pilihan 3 (Prioritas Ketiga)
+                <i class="fa-solid fa-3 mr-1"></i> Pilihan 3 (Opsional)
               </label>
               <select id="selectP3" class="w-full p-2.5 border border-amber-300 rounded-xl bg-amber-50 text-sm focus:ring-2 focus:ring-amber-500">
-                <option value="">-- Pilih Teman Pilihan 3 (Opsional) --</option>
+                <option value="">-- Pilih Teman Pilihan 3 --</option>
               </select>
             </div>
           </div>
@@ -153,7 +172,7 @@
     </section>
 
     <!-- ==================== TAB 2: SOSIOGRAM (INTERAKTIF) ==================== -->
-    <section id="tab-sosiogram" class="tab-content hidden space-y-4">
+    <section id="tab-sosiogram" class="tab-pane is-hidden space-y-4">
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-4">
         <!-- Legenda -->
         <div class="flex flex-wrap items-center gap-4 text-xs">
@@ -184,20 +203,20 @@
           <button onclick="fetchData()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700">
             <i class="fa-solid fa-arrows-rotate mr-1"></i> Segarkan Data
           </button>
-          <button onclick="stabilizeNetwork()" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg text-xs font-semibold text-indigo-700">
+          <button onclick="fitNetwork()" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg text-xs font-semibold text-indigo-700">
             <i class="fa-solid fa-crosshairs mr-1"></i> Pusatkan Graf
           </button>
         </div>
       </div>
 
-      <!-- Container Kanvas Vis.js -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-2 relative">
-        <div id="sociogram-canvas"></div>
+      <!-- Container Graf Utama -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-2">
+        <div id="sociogram-canvas" class="sociogram-box"></div>
       </div>
     </section>
 
     <!-- ==================== TAB 3: MATRIKS SOSIOMETRI ==================== -->
-    <section id="tab-analisis" class="tab-content hidden space-y-4">
+    <section id="tab-analisis" class="tab-pane is-hidden space-y-4">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
         <div class="mb-4">
           <h3 class="text-lg font-bold text-slate-800">Matriks Rekapitulasi Sosiometri</h3>
@@ -225,14 +244,10 @@
     </section>
 
     <!-- ==================== TAB 4: LAPORAN & CETAK (PRINT READY) ==================== -->
-    <section id="tab-laporan" class="tab-content hidden space-y-6">
-      <!-- Tombol Aksi Print (Tidak Dicetak) -->
+    <section id="tab-laporan" class="tab-pane is-hidden space-y-6">
+      <!-- Tombol Aksi Cetak -->
       <div class="flex justify-end items-center space-x-3 no-print max-w-4xl mx-auto">
-        <button onclick="captureSociogramImage()" class="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-semibold text-xs flex items-center space-x-1.5 transition">
-          <i class="fa-solid fa-camera"></i>
-          <span>Ambil Ulang Gambar Graf</span>
-        </button>
-        <button onclick="prepareAndPrint()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow font-semibold text-sm flex items-center space-x-2 transition">
+        <button onclick="window.print()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow font-semibold text-sm flex items-center space-x-2 transition">
           <i class="fa-solid fa-print"></i>
           <span>Cetak / Simpan PDF Laporan</span>
         </button>
@@ -278,12 +293,11 @@
           </div>
         </div>
 
-        <!-- 2. DIAGRAM SOSIOGRAM CETAK -->
+        <!-- 2. DIAGRAM SOSIOGRAM CETAK (DIRENDER LANGSUNG DENGAN CANVAS) -->
         <div class="mb-6">
           <h4 class="text-xs font-bold uppercase tracking-wider mb-2 border-b pb-1">II. Diagram Sosiogram Hubungan Sosial</h4>
-          <div class="border border-slate-300 rounded p-2 text-center bg-white min-h-[250px] flex items-center justify-center">
-            <img id="sociogramPrintImage" alt="Diagram Sosiogram Sedang Diproses..." class="max-h-80 mx-auto object-contain hidden">
-            <p id="sociogramPlaceholderText" class="text-xs text-slate-400 italic">Memproses gambar sosiogram...</p>
+          <div class="border border-slate-300 rounded p-1 bg-white">
+            <div id="print-sociogram-box" style="width: 100%; height: 420px;"></div>
           </div>
         </div>
 
@@ -355,7 +369,8 @@
       jawaban: []
     };
 
-    let network = null;
+    let mainNetwork = null;
+    let reportNetwork = null;
 
     window.addEventListener('DOMContentLoaded', () => {
       fetchData();
@@ -368,7 +383,7 @@
       document.getElementById('printTanggalLaporan').innerText = now.toLocaleDateString('id-ID', options);
     }
 
-    // 1. Ambil Data dari API Google Apps Script
+    // 1. Ambil Data
     async function fetchData() {
       const loading = document.getElementById('loadingIndicator');
       loading.classList.remove('hidden');
@@ -383,7 +398,7 @@
 
         applyConfig();
         populateDropdowns();
-        renderSociogram();
+        renderAllSociograms();
         renderMatrix();
       } catch (err) {
         console.error("Gagal mengambil data:", err);
@@ -392,7 +407,7 @@
       }
     }
 
-    // 2. Terapkan Konfigurasi & Logo
+    // 2. Sinkronkan Pengaturan
     function applyConfig() {
       const namaSekolah = state.config.Nama_Sekolah || "SMP NEGERI 2 PEKUNCEN";
       const instansi = state.config.Instansi_Atas || "PEMERINTAH KABUPATEN BANYUMAS";
@@ -480,10 +495,8 @@
       }
     });
 
-    // 5. Inisialisasi Graf Vis.js
-    function renderSociogram() {
-      const container = document.getElementById('sociogram-canvas');
-
+    // 5. Inisialisasi Graf Sosiogram (Tab Sosiogram & Lembar Laporan)
+    function renderAllSociograms() {
       const nodesArray = state.siswa.map(s => {
         const isL = (s.jk || '').toUpperCase() === 'L';
         return {
@@ -495,8 +508,8 @@
             border: isL ? '#0284c7' : '#db2777',
             highlight: { background: '#fef08a', border: '#ca8a04' }
           },
-          font: { color: '#0f172a', size: 12, face: 'Segoe UI', bold: true },
-          margin: 10,
+          font: { color: '#0f172a', size: 11, face: 'Segoe UI', bold: true },
+          margin: 8,
           borderWidth: 2
         };
       });
@@ -509,7 +522,7 @@
         if (j.p3) edgesArray.push({ from: from, to: String(j.p3), color: { color: '#f59e0b' }, width: 1.5, dashes: [4, 4], arrows: 'to' });
       });
 
-      const data = {
+      const graphData = {
         nodes: new vis.DataSet(nodesArray),
         edges: new vis.DataSet(edgesArray)
       };
@@ -517,47 +530,24 @@
       const options = {
         physics: {
           solver: 'barnesHut',
-          barnesHut: { gravitationalConstant: -3800, centralGravity: 0.35, springLength: 125 }
+          barnesHut: { gravitationalConstant: -3500, centralGravity: 0.35, springLength: 120 }
         },
         interaction: { hover: true }
       };
 
-      if (network) network.destroy();
-      network = new vis.Network(container, data, options);
+      // 1. Render Graf Interaktif Tab Sosiogram
+      const container1 = document.getElementById('sociogram-canvas');
+      if (mainNetwork) mainNetwork.destroy();
+      mainNetwork = new vis.Network(container1, graphData, options);
 
-      // Otomatis simpan gambar snapshot begitu graf stabil
-      network.once("stabilizationIterationsDone", function() {
-        captureSociogramImage();
-      });
-      network.on("afterDrawing", function() {
-        captureSociogramImage();
-      });
+      // 2. Render Graf Langsung di Lembar Laporan Cetak
+      const container2 = document.getElementById('print-sociogram-box');
+      if (reportNetwork) reportNetwork.destroy();
+      reportNetwork = new vis.Network(container2, graphData, options);
     }
 
-    // Fungsi Pengambil Gambar Snapshot Canvas ke Elemen Gambar Laporan
-    function captureSociogramImage() {
-      try {
-        const canvas = document.querySelector('#sociogram-canvas canvas');
-        if (canvas) {
-          const imgUrl = canvas.toDataURL('image/png');
-          const printImg = document.getElementById('sociogramPrintImage');
-          const placeholder = document.getElementById('sociogramPlaceholderText');
-          if (printImg && imgUrl && imgUrl.length > 50) {
-            printImg.src = imgUrl;
-            printImg.classList.remove('hidden');
-            if (placeholder) placeholder.classList.add('hidden');
-          }
-        }
-      } catch (e) {
-        console.error("Gagal mengambil snapshot sosiogram:", e);
-      }
-    }
-
-    function stabilizeNetwork() {
-      if (network) {
-        network.fit({ animation: true });
-        setTimeout(captureSociogramImage, 300);
-      }
+    function fitNetwork() {
+      if (mainNetwork) mainNetwork.fit({ animation: true });
     }
 
     // 6. Matriks Rekapitulasi & Lembar Laporan
@@ -603,7 +593,6 @@
           terabaikanList.push(s.nama);
         }
 
-        // Baris Matriks Layar Web
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50";
         tr.innerHTML = `
@@ -618,7 +607,6 @@
         `;
         tbody.appendChild(tr);
 
-        // Baris Tabel Lembar Cetak
         const printTr = document.createElement('tr');
         printTr.innerHTML = `
           <td class="border border-slate-300 p-1 text-center">${idx + 1}</td>
@@ -638,26 +626,17 @@
       document.getElementById('statTerabaikan').innerText = terabaikanList.length > 0 ? terabaikanList.join(', ') : 'Tidak ada';
     }
 
-    // 7. Cetak / Simpan PDF
-    function prepareAndPrint() {
-      captureSociogramImage();
-      setTimeout(() => {
-        window.print();
-      }, 300);
-    }
-
-    // 8. Navigasi Antar Tab (Memastikan Kanvas Tetap Ter-render)
+    // 7. Navigasi Antar Tab (Menggunakan Teknik Off-Screen agar Canvas Tetap Aktif)
     function switchTab(tabId) {
-      // Sembunyikan tab dengan visual opacity/position agar canvas tetap di-render browser
       const tabs = ['angket', 'sosiogram', 'analisis', 'laporan'];
       tabs.forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         const btn = document.getElementById(`tabBtn-${t}`);
         if (el) {
           if (t === tabId) {
-            el.classList.remove('hidden');
+            el.classList.remove('is-hidden');
           } else {
-            el.classList.add('hidden');
+            el.classList.add('is-hidden');
           }
         }
         if (btn) {
@@ -672,23 +651,17 @@
         activeBtn.classList.remove('text-indigo-100');
       }
 
-      if (tabId === 'sosiogram' && network) {
-        setTimeout(() => { 
-          network.redraw(); 
-          network.fit(); 
-          captureSociogramImage();
-        }, 150);
-      }
-
-      if (tabId === 'laporan') {
-        if (network) {
-          network.redraw();
-          network.fit();
+      // Pastikan graf langsung fit begitu tab sosiogram atau laporan dibuka
+      setTimeout(() => {
+        if (tabId === 'sosiogram' && mainNetwork) {
+          mainNetwork.redraw();
+          mainNetwork.fit();
         }
-        setTimeout(() => {
-          captureSociogramImage();
-        }, 200);
-      }
+        if (tabId === 'laporan' && reportNetwork) {
+          reportNetwork.redraw();
+          reportNetwork.fit();
+        }
+      }, 100);
     }
   </script>
 </body>
