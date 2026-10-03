@@ -9,11 +9,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Vis.js Network -->
+  <!-- Vis.js Network Library -->
   <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 
   <style>
-    /* Styling Kanvas Graf */
+    /* Ukuran Wadah Graf */
     .sociogram-box {
       width: 100%;
       height: 520px;
@@ -22,7 +22,7 @@
       border-radius: 0.5rem;
     }
 
-    /* Teknik Tab Tanpa Mematikan Dimensi Canvas */
+    /* Teknik Tab Tanpa Mematikan Dimensi Canvas Vis.js */
     .tab-pane {
       display: block;
     }
@@ -44,7 +44,7 @@
       border-radius: 4px;
     }
 
-    /* PENGATURAN CETAK / PRINT PDF */
+    /* FORMAT CETAK / PRINT PDF RESMI A4 */
     @media print {
       body {
         background: #ffffff !important;
@@ -75,7 +75,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
 
-  <!-- TOP NAVIGATION -->
+  <!-- TOP NAVIGATION BAR (Disembunyikan Saat Cetak) -->
   <nav class="bg-indigo-900 text-white shadow-lg sticky top-0 z-50 no-print">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
       <div class="flex items-center space-x-3">
@@ -86,7 +86,7 @@
         </div>
       </div>
       
-      <!-- NAV TABS -->
+      <!-- MENU TAB -->
       <div class="flex space-x-1 sm:space-x-2">
         <button onclick="switchTab('angket')" id="tabBtn-angket" class="tab-btn px-3 py-2 rounded-lg text-xs sm:text-sm font-medium bg-indigo-700 text-white">
           <i class="fa-solid fa-pen-to-square mr-1"></i> Angket Siswa
@@ -209,7 +209,7 @@
         </div>
       </div>
 
-      <!-- Container Graf Utama -->
+      <!-- Wadah Graf Interaktif -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-2">
         <div id="sociogram-canvas" class="sociogram-box"></div>
       </div>
@@ -256,16 +256,18 @@
       <!-- LEMBAR DOKUMEN CETAK (A4) -->
       <div class="print-page bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-slate-200 max-w-4xl mx-auto text-black">
         
-        <!-- KOP SURAT RESMI -->
+        <!-- KOP SURAT RESMI (LOGO BANYUMAS & LOGO SEKOLAH) -->
         <div class="flex items-center justify-between border-b-4 border-double border-black pb-4 mb-6">
-          <img id="printLogoBanyumas" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Lambang_Kabupaten_Banyumas.png/200px-Lambang_Kabupaten_Banyumas.png" alt="Logo Banyumas" class="h-20 w-20 object-contain">
+          <img id="printLogoBanyumas" src="https://lh3.googleusercontent.com/d/1I25LYs-NVRvKYPaIQ30RU9vkdMrmTg0S" alt="Logo Banyumas" class="h-20 w-20 object-contain">
+          
           <div class="text-center flex-1 px-4">
             <h3 class="text-sm font-semibold tracking-wider uppercase" id="printInstansi">PEMERINTAH KABUPATEN BANYUMAS</h3>
             <h2 class="text-xl font-bold tracking-wide uppercase" id="printSekolah">SMP NEGERI 2 PEKUNCEN</h2>
             <p class="text-xs font-semibold uppercase tracking-wider text-slate-700">Layanan Bimbingan dan Konseling</p>
             <p class="text-xs italic mt-0.5" id="printTahun">Tahun Pelajaran 2026/2027</p>
           </div>
-          <img id="printLogoSekolah" src="https://via.placeholder.com/80?text=Logo+Sekolah" alt="Logo Sekolah" class="h-20 w-20 object-contain">
+
+          <img id="printLogoSekolah" src="https://lh3.googleusercontent.com/d/1oxZCi0JdecC-9-SgV0kdUAURm0kU-Cxk" alt="Logo Sekolah" class="h-20 w-20 object-contain">
         </div>
 
         <!-- JUDUL LAPORAN -->
@@ -293,7 +295,7 @@
           </div>
         </div>
 
-        <!-- 2. DIAGRAM SOSIOGRAM CETAK (DIRENDER LANGSUNG DENGAN CANVAS) -->
+        <!-- 2. DIAGRAM SOSIOGRAM CETAK (DIRENDER LANGSUNG DENGAN KANVAS ASLI) -->
         <div class="mb-6">
           <h4 class="text-xs font-bold uppercase tracking-wider mb-2 border-b pb-1">II. Diagram Sosiogram Hubungan Sosial</h4>
           <div class="border border-slate-300 rounded p-1 bg-white">
@@ -331,22 +333,22 @@
           </p>
         </div>
 
-        <!-- TANDA TANGAN -->
-        <div class="flex justify-between items-start text-xs pt-4">
-          <div class="text-center w-52">
+        <!-- TANDA TANGAN RESMI -->
+        <div class="flex justify-between items-start text-xs pt-6">
+          <div class="text-center w-60">
             <p>Mengetahui,</p>
             <p class="font-semibold">Kepala Sekolah</p>
-            <div class="h-16"></div>
+            <div class="h-20"></div>
             <p class="font-bold underline" id="printNamaKepsek">( ............................................ )</p>
-            <p>NIP. ........................................</p>
+            <p id="printNipKepsek">NIP. ........................................</p>
           </div>
 
-          <div class="text-center w-52">
+          <div class="text-center w-60">
             <p>Pekuncen, <span id="printTanggalLaporan"></span></p>
             <p class="font-semibold">Guru Bimbingan dan Konseling</p>
-            <div class="h-16"></div>
+            <div class="h-20"></div>
             <p class="font-bold underline" id="printNamaGuruBK">( ............................................ )</p>
-            <p>NIP. ........................................</p>
+            <p id="printNipGuruBK">NIP. ........................................</p>
           </div>
         </div>
 
@@ -362,6 +364,10 @@
   <!-- SCRIPT LOGIC LENGKAP -->
   <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyu6ivhE3xDFIzxFZxYt27Lv7bi6FWZ0Q2e8kC_taDcz2p5RhXCPbRanKT1jzjk19OD/exec";
+
+    // Link CDN Gambar Langsung
+    const DEFAULT_LOGO_BANYUMAS = "https://lh3.googleusercontent.com/d/1I25LYs-NVRvKYPaIQ30RU9vkdMrmTg0S";
+    const DEFAULT_LOGO_SEKOLAH  = "https://lh3.googleusercontent.com/d/1oxZCi0JdecC-9-SgV0kdUAURm0kU-Cxk";
 
     let state = {
       config: {},
@@ -383,7 +389,7 @@
       document.getElementById('printTanggalLaporan').innerText = now.toLocaleDateString('id-ID', options);
     }
 
-    // 1. Ambil Data
+    // 1. Ambil Data dari API Google Apps Script
     async function fetchData() {
       const loading = document.getElementById('loadingIndicator');
       loading.classList.remove('hidden');
@@ -407,28 +413,49 @@
       }
     }
 
-    // 2. Sinkronkan Pengaturan
+    // 2. Terapkan Konfigurasi, Nama Pejabat & Logo
     function applyConfig() {
       const namaSekolah = state.config.Nama_Sekolah || "SMP NEGERI 2 PEKUNCEN";
       const instansi = state.config.Instansi_Atas || "PEMERINTAH KABUPATEN BANYUMAS";
-      const kelas = state.config.Kelas || "-";
+      const kelas = state.config.Kelas || "VIII";
       const tapel = state.config.Tahun_Ajaran || "2026/2027";
       const kriteria = state.config.Kriteria_Pilihan || "Teman belajar kelompok dan diskusi yang paling nyaman";
+      
+      // Tanda Tangan & NIP
       const guruBK = state.config.Guru_BK || "( ............................................ )";
-      const logoBanyumas = state.config.Url_Logo_Banyumas || "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Lambang_Kabupaten_Banyumas.png/200px-Lambang_Kabupaten_Banyumas.png";
-      const logoSekolah = state.config.Url_Logo_Sekolah || "https://via.placeholder.com/80?text=Logo+Sekolah";
+      const nipGuruBK = state.config.Nip_Guru_BK ? `NIP. ${state.config.Nip_Guru_BK}` : "NIP. ........................................";
+      const kepsek = state.config.Nama_Kepsek || "( ............................................ )";
+      const nipKepsek = state.config.Nip_Kepsek ? `NIP. ${state.config.Nip_Kepsek}` : "NIP. ........................................";
 
+      // Terapkan Logo
+      const logoBanyumas = (state.config.Url_Logo_Banyumas && state.config.Url_Logo_Banyumas.includes("http")) ? state.config.Url_Logo_Banyumas : DEFAULT_LOGO_BANYUMAS;
+      const logoSekolah = (state.config.Url_Logo_Sekolah && state.config.Url_Logo_Sekolah.includes("http")) ? state.config.Url_Logo_Sekolah : DEFAULT_LOGO_SEKOLAH;
+
+      // Header Aplikasi Web
       document.getElementById('subHeaderSekolah').innerText = namaSekolah;
       document.getElementById('kriteriaLabel').innerText = kriteria;
 
+      // Lembar Laporan Cetak
       document.getElementById('printInstansi').innerText = instansi;
       document.getElementById('printSekolah').innerText = namaSekolah;
       document.getElementById('printTahun').innerText = `Tahun Pelajaran ${tapel}`;
       document.getElementById('printKelas').innerText = kelas;
       document.getElementById('printKriteria').innerText = kriteria;
+
+      // Tanda Tangan
       document.getElementById('printNamaGuruBK').innerText = guruBK;
-      document.getElementById('printLogoBanyumas').src = logoBanyumas;
-      document.getElementById('printLogoSekolah').src = logoSekolah;
+      document.getElementById('printNipGuruBK').innerText = nipGuruBK;
+      document.getElementById('printNamaKepsek').innerText = kepsek;
+      document.getElementById('printNipKepsek').innerText = nipKepsek;
+
+      // Render Logo Gambar
+      const imgBanyumas = document.getElementById('printLogoBanyumas');
+      imgBanyumas.referrerPolicy = "no-referrer";
+      imgBanyumas.src = logoBanyumas;
+
+      const imgSekolah = document.getElementById('printLogoSekolah');
+      imgSekolah.referrerPolicy = "no-referrer";
+      imgSekolah.src = logoSekolah;
     }
 
     // 3. Dropdown Angket
@@ -454,7 +481,7 @@
       });
     }
 
-    // 4. Form Submit
+    // 4. Form Submit Angket Siswa
     document.getElementById('sosiometriForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
@@ -626,7 +653,7 @@
       document.getElementById('statTerabaikan').innerText = terabaikanList.length > 0 ? terabaikanList.join(', ') : 'Tidak ada';
     }
 
-    // 7. Navigasi Antar Tab (Menggunakan Teknik Off-Screen agar Canvas Tetap Aktif)
+    // 7. Navigasi Antar Tab (Off-Screen Switching)
     function switchTab(tabId) {
       const tabs = ['angket', 'sosiogram', 'analisis', 'laporan'];
       tabs.forEach(t => {
@@ -651,7 +678,7 @@
         activeBtn.classList.remove('text-indigo-100');
       }
 
-      // Pastikan graf langsung fit begitu tab sosiogram atau laporan dibuka
+      // Refresh kanvas saat tab dibuka
       setTimeout(() => {
         if (tabId === 'sosiogram' && mainNetwork) {
           mainNetwork.redraw();
